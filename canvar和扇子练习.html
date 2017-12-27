@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        div{
+            overflow: hidden;
+        }
+        ul li{
+            position: relative;
+            height: 400px;
+        }
+
+        ul li{
+            list-style: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;;
+            margin:  auto;
+            transition: 1s;
+            width: 60px;
+            height: 200px;
+            transform-origin:15px 185px;
+            box-shadow: 2px 2px 20px #000;
+        }
+
+    </style>
+</head>
+<body style="margin: 0;padding: 0;">
+    <div>
+        <canvas id="canvas" style="background-color: #818181"></canvas>
+        <ul>
+            <li style="background-color: #ffd200"></li>
+            <li style="background-color: #66ff00"></li>
+            <li style="background-color: #00fff0"></li>
+            <li style="background-color: #0030ff"></li>
+            <li style="background-color: #d800ff"></li>
+            <li style="background-color: #ff0000"></li>
+            <li style="background-color: #ffd200"></li>
+            <li style="background-color: #66ff00"></li>
+            <li style="background-color: #00fff0"></li>
+            <li style="background-color: #0030ff"></li>
+            <li style="background-color: #d800ff"></li>
+            <li style="background-color: #000">
+                <div style="width: 10px;height: 10px;border-radius: 100%;background: #ffffff;bottom: 10px;left: 10px;position: absolute;">
+
+                </div>
+            </li>
+        </ul>
+
+    </div>
+    <script>
+        var lis = document.getElementsByTagName("li");
+        var clickLi = true;
+        lis[lis.length -1].onclick=function(){
+                for(var k = 0;k < lis.length ;k++) {
+                    var n =k-Math.ceil(lis.length/2);
+                    var deg = clickLi ? n * 15 : 360;
+                    lis[k].style.transform = 'rotate('+deg+
+                    'deg)';
+                }
+            clickLi=!clickLi
+        }
+        for(var L = 0;L < lis.length-1 ;L++){
+            lis[L].index = L;
+            lis[L].onclick=function(){
+                var v =   this.index;
+                for(var k = 0;k < lis.length ;k++){
+                    var number = k- v;
+                    if(number < 0){
+                        lis[k].style.transform ='rotate('+(number)*15+'deg)';
+                    }else if(number > 0){
+                        lis[k].style.transform ='rotate('+(number+1)*15+'deg)';
+                    }else {
+                        lis[k].style.transform ='rotate(0deg)';
+                    }
+                }
+            }
+        }
+        var canvas = document.getElementById("canvas");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight + 200;
+        var  context = canvas.getContext('2d')
+     var    colorClass = ['#ffd200','#66ff00','#00fff0','#0030ff','#d800ff','#ff0000','#ae00ff','#00e4ff','#fffc00']
+        //随机产生 2个值 中的任意值
+        function  getNumber(min,max){
+             return Math.round(Math.random()*(max-min)+min);
+        }
+        // 画园
+        function drawRotate(rota){
+            context.beginPath();
+            context.arc(rota.x,rota.y,rota.r,0,2*Math.PI);
+            context.fillStyle=rota.color;
+            context.globalCompositeOperation="lighter";
+            context.fill();
+            context.closePath();
+        }
+        var balls = [];//放所有的汽泡
+        var openTime = true
+        canvas.onmousemove = function(ev){
+            ev=ev || window.event;
+            for(var p=0;p<10;p++ ){
+                var rotateClass={
+                    x:ev.clientX + getNumber(-5,5), //圆心x
+                    y:ev.clientY+ getNumber(-5,5), //圆心y
+                    vx : Math.random()-0.5,
+                    vy :   Math.random()-0.5,
+                    color :colorClass[getNumber(0,colorClass.length-1)],
+                    r : getNumber(10,45)
+                }
+                balls.push(rotateClass)
+            }
+            if(openTime){
+                var time = window.setInterval(function(){
+                    dragBalls();
+                    openTime=!openTime;
+                },100)
+            }
+
+           /* for(var t=0;t<balls.length;t++){
+                drawRotate(balls[t])
+            }*/
+        }
+        function dragBalls(){
+            context.clearRect(0,0,canvas.width,canvas.height);
+            for(var t=0;t<balls.length;t++){
+                balls[t].x =balls[t].x+(balls[t].vx );
+                balls[t].y =balls[t].y+(balls[t].vy );
+                balls[t].r = balls[t].r*0.98;
+                if(balls[t].r<1){
+                    balls.splice(t,0);
+                    continue;
+                }
+                context.globalCompositeOperation = 1;
+                drawRotate(balls[t]);
+            }
+        }
+    </script>
+</body>
+</html>
